@@ -1,0 +1,32 @@
+import gradio as gr
+import time
+from transformers import pipeline
+
+# Load ASR model
+p = pipeline("automatic-speech-recognition")
+
+# Function to transcribe audio
+def transcribe(audio, state):
+    time.sleep(1)
+    if audio is None:
+        return state, state
+
+    text = p(audio)["text"]
+    state = state + " " + text
+    return state, state
+
+# Build Interface
+demo = gr.Interface(
+    fn=transcribe,
+    inputs=[
+        gr.Audio(sources=["microphone"], type="filepath", label="Record Audio"),  # <--- sources is a list
+        gr.State("")
+    ],
+    outputs=[
+        gr.Textbox(label="Transcription"),
+        gr.State()
+    ],
+    live=True
+)
+
+demo.launch()
